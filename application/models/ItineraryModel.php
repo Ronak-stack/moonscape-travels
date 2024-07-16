@@ -38,7 +38,7 @@ class ItineraryModel extends CI_Model {
     }
 
     public function getPackageItineraries($id) {
-        $result = $this->db->select('b.itinerary_name')->from('package_itinerary_mapping as a')->join('itineraries as b', 'a.itinerary_id = b.id')->where('a.package_id',$id)->get();
+        $result = $this->db->select('b.id as itinery_id, b.itinerary_name')->from('package_itinerary_mapping as a')->join('itineraries as b', 'a.itinerary_id = b.id')->where('a.package_id',$id)->get();
         if($result->num_rows() > 0) {
             return $result->result();
         }

@@ -92,6 +92,36 @@
             </ul>
           </li>
 
+          <li class="nav-item <?php if($this->uri->segment('2') == 'cars'): ?>menu-is-opening menu-open<?php endif;?>">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-copy"></i>
+              <p>
+                Cars Rental
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?php echo base_url();?>admin/cars/add" class="nav-link <?php if($this->uri->segment('2') == 'cars' && $this->uri->segment('3') == 'add'): ?>active<?php endif;?>">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Add</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?php echo base_url();?>admin/cars/list" class="nav-link <?php if($this->uri->segment('2') == 'cars' && $this->uri->segment('3') == 'list'): ?>active<?php endif;?>">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>List</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?php echo base_url();?>admin/cars/categories/list" class="nav-link <?php if($this->uri->segment('2') == 'cars' && $this->uri->segment('3') == 'categories'): ?>active<?php endif;?>">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Category List</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+
         </ul>
       </nav>
       <!-- /.sidebar-menu -->

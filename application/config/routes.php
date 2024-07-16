@@ -62,6 +62,11 @@ $route['admin/packages/add'] = 'Package/add';
 $route['admin/packages/list'] = 'Package';
 $route['admin/packages/details/(:num)'] = 'Package/details/$1';
 $route['admin/packages/delete/(:num)'] = 'Package/delete/$1';
+$route['admin/package/update/status'] = 'Package/updateStatus';
+$route['admin/packages/published/(:num)'] = 'Package/publishPackage/$1';
+$route['admin/packages/un/published/(:num)'] = 'Package/unPublishPackage/$1';
+$route['admin/package/update/show/(:num)'] = 'Package/updatePackageShow/$1';
+$route['admin/package/update/(:num)'] = 'Package/updatePackage/$1';
 
 // Itinerary Manager
 $route['admin/itineraries/add'] = 'Itinerary/add';
@@ -74,5 +79,15 @@ $route['admin/days/add'] = 'Days/addDays';
 $route['admin/days/list'] = 'Days/showDays';
 $route['admin/days/find/(:num)'] = 'Days/findDay/$1';
 $route['admin/days/delete/(:num)'] = 'Days/delete/$1';
+
+$route['admin/cars/add'] = 'Car/addCar';
+$route['admin/cars/list'] = 'Car/carList';
+$route['admin/cars/categories'] = 'Car/showCarCategories';
+$route['admin/cars/categories/list'] = 'Car/showCarCategories';
+$route['admin/cars/delete/(:num)'] = 'Car/deleteCar/$1';
+$route['admin/car/update/(:num)'] = 'Car/updateCar/$1';
+$route['admin/car/categories/add'] = 'Car/addCategory';
+$route['admin/car/categories/update/(:num)'] = 'Car/category/$1';
+$route['admin/cars/categories/delete/(:num)'] = 'Car/deleteCarCategories/$1';
 
 $route['translate_uri_dashes'] = FALSE;

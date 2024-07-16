@@ -45,16 +45,19 @@
                                 $activationBtn;
                                 if ($packages) : foreach ($packages as $package) : 
                                 if($package->is_active) {
-                                    $activationBtn = '<button type="button" class="btn btn-sm btn-success" onclick="changePackageActvation('.$package->id.')">Activated</button>';
+                                    $activationBtn = '<button type="button" class="btn btn-sm btn-success" onclick="changePackageActvation('.$package->id.', '.$package->is_active.')">Activated</button>';
                                 } else {
-                                    $activationBtn = '<button type="button" class="btn btn-sm btn-danger" onclick="changePackageActvation('.$package->id.')">In-activate</button>';
+                                    $activationBtn = '<button type="button" class="btn btn-sm btn-danger" onclick="changePackageActvation('.$package->id.', '.$package->is_active.')" >De-activated</button>';
                                 }
 
                                 $publishedStatusTooltip;
+                                $showPublishiedBtn = false;
                                 $this->load->model('DaysModel');
                                 $query = $this->db->where('package_id',$package->id)->get('package_days_visiting_details');
-                                if(($query->num_rows() > 0) && !$package->is_active) {
+                                $havingVisitingDays = $query->num_rows();
+                                if(($havingVisitingDays > 0) && !$package->published) {
                                     $publishedStatusTooltip = 'Package has visiting days but still not published';
+                                    $showPublishiedBtn = true;
                                 } else {
                                     $publishedStatusTooltip = 'Visiting days not added for this package';
                                 }
@@ -75,7 +78,12 @@
                                             </td>
                                             <td><?php echo $package->created_at; ?></td>
                                             <td>
-                                                <button type="button"  data-toggle="tooltip" data-placement="top" title="Edit Package" class="btn btn-sm btn-primary"><i class="fa fa-edit"></i></button>
+                                                <?php if($showPublishiedBtn):?>
+                                                <button type="button" data-toggle="tooltip" data-placement="top" title="Publish Package" onclick="publishPackage(<?php echo $package->id;?>)" class="btn btn-sm btn-success"><i class="fa fa-upload"></i></button>
+                                                <?php else: ?>
+                                                <button type="button" data-toggle="tooltip" data-placement="top" title="Un Publish Package" <?php echo $havingVisitingDays > 0 ? '': 'disabled';?> onclick="unPublishPackage(<?php echo $package->id;?>)" class="btn btn-sm btn-secondary"><i class="fa fa-download"></i></button>
+                                                <?php endif; ?>
+                                                <a href="<?php echo base_url();?>admin/package/update/show/<?php echo $package->id;?>" data-toggle="tooltip" data-placement="top" title="Edit Package" class="btn btn-sm btn-primary"><i class="fa fa-edit"></i></a>
                                                 <button type="button" data-toggle="tooltip" data-placement="top" title="Remove Package" onclick="removePackage(<?php echo $package->id; ?>)" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
                                             </td>
                                         </tr>

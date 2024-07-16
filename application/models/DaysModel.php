@@ -105,4 +105,22 @@ class DaysModel extends CI_Model {
         }
         return false;
     }
+
+    public function removeDayFromPackage($id) {
+        $message = '';
+        $success = false;
+        $this->db->trans_begin();
+        if($this->db->where('id', $id)->delete('package_days_visiting_details')) {
+            $message = 'Day deleted.';
+            $success = true;
+        } else {
+            $message = 'Day not removed.';
+        }
+        if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+        } else {
+            $this->db->trans_commit();
+        }
+        return ['success' => $success, 'message' => $message];
+    }
 }

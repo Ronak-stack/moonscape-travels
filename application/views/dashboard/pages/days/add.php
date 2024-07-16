@@ -4,14 +4,14 @@
 <section class="mt-5">
     <div class="container">
         <?php if ($this->session->flashdata('error')) : ?>
-            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 <?php echo $this->session->flashdata('error'); ?>
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-        <?php elseif ($this->session->flashdata('succes')) : ?>
-            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <?php elseif ($this->session->flashdata('success')) : ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
                 <?php echo $this->session->flashdata('success'); ?>
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>

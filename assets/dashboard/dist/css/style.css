@@ -51,3 +51,41 @@
     background-position: center;
   }
   
+.avatar-upload .avatar-edit {
+  position: absolute;
+  z-index: 1;
+  top: 10px;
+}
+
+.car-upload {
+    position: relative;
+    max-width: 80%;
+    margin: 0px auto;
+}
+
+.car-upload .car-edit {
+  position: absolute;
+  z-index: 1;
+  top: 0px;
+}
+
+.car-upload .car-edit input + label {
+  display: inline-block;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 0;
+  border-radius: 100%;
+  background: #FFFFFF;
+  border: 1px solid transparent;
+  box-shadow: 0px 2px 4px 0px #000;
+  cursor: pointer;
+  font-weight: normal;
+  transition: all 0.2s ease-in-out;
+}
+
+.caravatar-upload .car-preview {
+  width: 100%;
+  height: 275px;
+  position: relative;
+  border: 6px solid #F8F8F8;
+}

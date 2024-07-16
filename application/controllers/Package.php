@@ -61,4 +61,62 @@ class Package extends CI_Controller {
         }
         redirect('admin/packages/list');
     }
+
+    public function updateStatus() {
+        $response = $this->PackageModel->updateStatus();
+        if($response) {
+            echo json_encode(['success' => true, 'message' => 'Package status updated.', 'data' => []]);
+            return true;
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Package statu snot updated.', 'data' => []]);
+            return false;
+        }
+        return false;
+    }
+
+    public function publishPackage($id) {
+        $response = $this->PackageModel->publishPackage($id);
+        if($response['success']) {
+            $this->session->set_flashdata('success', 'This package has been published now!');
+        } else {
+            $this->session->set_flashdata('error', $response['message']);
+        }
+        redirect('admin/packages/list');
+    }
+
+    public function unPublishPackage($id) {
+        $response = $this->PackageModel->publishPackage($id, false);
+        if($response['success']) {
+            $this->session->set_flashdata('success', 'This package has been un-published now!');
+        } else {
+            $this->session->set_flashdata('error', $response['message']);
+        }
+        redirect('admin/packages/list');
+    }
+
+    public function updatePackageShow($id) {
+        if(!empty($id)) {
+            $details = $this->PackageModel->getPackageDetails($id);
+            $itineraries = $this->ItineraryModel->getPackageItineraries($id);
+            $allItineraries = $this->ItineraryModel->getItineraries($id);
+            $locations = $this->PackageModel->getAllLocations();
+            $this->load->view("dashboard/pages/package/update", ['package_id' => $id,'details' => $details, 'itineraries' => $itineraries, 'locations' => $locations, 'all_itineries' => $allItineraries]);
+        } else {
+            redirect('admin/packages/list');
+        }
+    }
+
+    public function updatePackage($id) {
+        if(!empty($id)) {
+            $response = $this->PackageModel->updatePackage($id);
+            if($response['success']) {
+                $this->session->set_flashdata('success', 'Package updated.');
+            } else {
+                $this->session->set_flashdata('success', $response['message']);
+            }
+        } else {
+            $this->session->set_flashdata('success', 'Ooppss...something error.');
+        }
+        redirect('admin/packages/list');
+    }
 }

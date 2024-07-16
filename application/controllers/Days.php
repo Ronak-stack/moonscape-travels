@@ -17,7 +17,6 @@ class Days extends CI_Controller {
     }
 
     public function addDays() {
-        $_POST ? print_r($_POST) : '';
         if($this->input->post('package_id')) {
             $saveDaysResponse = $this->DaysModel->addDays();
             if($saveDaysResponse) {
@@ -49,5 +48,19 @@ class Days extends CI_Controller {
         }
         echo json_encode(['success' => false, 'message' => 'Oooppss...something error!', 'data' => []]);
         return false;
+    }
+
+    public function delete($id) {
+        if(!empty($id)) {
+            $response = $this->DaysModel->removeDayFromPackage($id);
+            if($response['success']) {
+                $this->session->set_flashdata('success', 'Day Removed!');
+            } else {
+                $this->session->set_flashdata('error', $response['message']);
+            }
+        } else {
+            $this->session->set_falshdata('error', 'Please select day which you want remove from package.');            
+        }
+        redirect('admin/days/list');
     }
 }

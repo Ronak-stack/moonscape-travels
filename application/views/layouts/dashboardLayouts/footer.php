@@ -53,7 +53,7 @@
 
     $(function() {
       $('[data-toggle="tooltip"]').tooltip()
-    })
+    });
 
   });
 
@@ -64,6 +64,20 @@
 
     reader.addEventListener("load", function() {
       preview.src = reader.result;
+    }, false);
+
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function previewCarFile() {
+    var carImagePreview = document.querySelector('img[id=carImagePreview]');
+    var file = document.querySelector('input[type=file]').files[0];
+    var reader = new FileReader();
+
+    reader.addEventListener("load", function() {
+      carImagePreview.src = reader.result;
     }, false);
 
     if (file) {
@@ -121,10 +135,14 @@
       var dataJson = {
         [csrfName]: csrfHash
       };
+      
       $.ajax({
         url: '<?php echo base_url(); ?>admin/packages/details/' + packageId,
         method: 'POST',
         data: dataJson,
+        beforeSend: function() {
+          $('#overlay').show();
+        },
         success: function(response) {
           let res = JSON.parse(response);
           if (res.success) {
@@ -135,7 +153,10 @@
             model += '</table></div><div class="modal-footer"><button type="button" class="btn btn-primary btn-sm" data-dismiss="modal"><i class="fa fa-times"></i> Close</button></div></div></div>';
 
             $('#show-package-details').html(model).modal('show');
+          } else {
+            toastr.error(res.message);
           }
+          $('#overlay').hide();
         }
       });
     }
@@ -145,6 +166,44 @@
         window.location.replace('<?php echo  base_url(); ?>admin/packages/delete/' + id);
       }
     }
+
+    function changePackageActvation(id, status) {
+      var csrfName = '<?php echo $this->security->get_csrf_token_name(); ?>',
+        csrfHash = '<?php echo $this->security->get_csrf_hash(); ?>';
+      var dataJson = {
+        [csrfName]: csrfHash,
+        id: id,
+        status: !status
+      };
+      $('#overlay').show();
+      $.ajax({
+        url: '<?php echo  base_url();?>admin/package/update/status',
+        method: 'POST',
+        data: dataJson,
+        success: function(response) {
+          var res = JSON.parse(response);
+          if(res.success) {
+            toastr.success(res.message);
+          } else {
+            toastr.error(res.message);
+          }
+          location.reload();
+        }
+      });
+    }
+
+  function publishPackage(id) {
+    if(confirm('Do you want to confirm published this package for user?')) {
+      window.location.replace('<?php echo base_url();?>admin/packages/published/'+id);
+    }
+  }
+
+  function unPublishPackage(id) {
+    if(confirm('Do you want to un-published this package?')) {
+      window.location.replace('<?php echo base_url();?>admin/packages/un/published/'+id);
+    }
+  }
+
   <?php elseif ($this->uri->segment(2) == 'days') : ?>
 
     function searchPackage() {
@@ -155,6 +214,7 @@
       };
       var packageId = $('#selected_package_id').find(":selected").val();
       if (packageId != '') {
+        $('#overlay').show();
         $.ajax({
           url: '<?php echo base_url(); ?>admin/packages/details/' + packageId,
           method: 'POST',
@@ -172,7 +232,10 @@
                 $('#days').append(textBox);
               }
               $('#card-body-set').show();
+            } else {
+              toastr.error('error', res.message);
             }
+            $('#overlay').hide();
           }
         });
       }
@@ -186,6 +249,7 @@
         var dataJson = {
           [csrfName]: csrfHash
         };
+        $('#overlay').show();
         $.ajax({
           url: '<?php echo base_url();?>admin/days/find/'+dayId,
           method: 'POST',
@@ -199,10 +263,127 @@
             } else {
               toastr.error(res.message);
             }
+            $('#overlay').hide();
           }
         })
       }
     }
+
+    function removeSingleDay(id) {
+      if(confirm('Do you want to remove this day from your selected package?')) {
+        window.location.replace('<?php echo base_url();?>admin/days/delete/'+id);
+      }
+    }
+
+  <?php elseif($this->uri->segment(2) == 'cars'):?>
+    $('#add-category').click(function() {
+      let modal = '<div class="modal-dialog" role="document"><div class="modal-content"><div class="modal-header"><h3 class="modal-title">Add New Category</h3></div><div class="modal-body"><div class="row"><div class="col-12"><div class="form-group"><label>Category Name</label><input type="text" name="category_name" class="form-control form-control-sm" placeholder="Enter category name."></div></div></div><span class="text-danger" id="error-cate"></span></div><div class="modal-footer"><button class="btn btn-sm btn-primary" type="button" onclick="saveCategory()"><i class="fa fa-plus"></i> Save Category</button></div></div></div>';
+      $('#show-category-add-modal').html(modal).modal('show');
+    });
+
+    function saveCategory(id = null) {
+      categoryName = $('input[name="category_name"]').val();
+      if(categoryName != '') {
+        $("#error-cate").text('');
+        var csrfName = '<?php echo $this->security->get_csrf_token_name(); ?>',
+          csrfHash = '<?php echo $this->security->get_csrf_hash(); ?>';
+        var dataJson = {
+          [csrfName]: csrfHash,
+          category_name: categoryName
+        };
+        if(id != null) {
+          dataJson['cate_id'] = id;
+        }
+        $('#overlay').show();
+        $.ajax({
+          url: '<?php echo base_url();?>admin/car/categories/add',
+          method: 'POST',
+          data: dataJson,
+          success: function(response) {
+            let res = JSON.parse(response);
+            if(res.success) {
+              if(res.data.type == 'add') {
+                $('select[name="car_category_id"]').append($("<option></option>")
+                      .attr("value", res.data.category.id)
+                      .text(res.data.category.category)); 
+              }
+              $('#show-category-add-modal').modal('hide');
+              toastr.success('success', res.message);
+            } else {
+              toastr.success('error', res.message);
+            }
+            $('#overlay').hide();
+            if(id!=null) {
+              location.reload();
+            }
+          }
+        });
+      } else {
+        $("#error-cate").text('Please enter category name!');
+        return false;
+      }
+    }
+
+    $('#cars-list').DataTable({
+      topStart: 'pageLength',
+      topEnd: 'search',
+      bottomStart: 'info',
+      bottomEnd: 'paging',
+      autoWidth: true
+      });
+
+      function openUpdateCarModal(id,carName,category_id, imgUrl) {
+        var formUrl = '<?php echo  base_url();?>admin/cars/add';
+        var csrfName = '<?php echo $this->security->get_csrf_token_name(); ?>',
+          csrfHash = '<?php echo $this->security->get_csrf_hash(); ?>';
+        var dataJson = {
+          [csrfName]: csrfHash,
+          ajaxCall: true
+        };
+        $('#overlay').show();
+        $.ajax({
+          url: '<?php echo base_url();?>admin/cars/categories/list',
+          method: 'POST',
+          data: dataJson,
+          success: function(response) {
+            let res = JSON.parse(response);
+            let modal = '<div class="modal-dialog" role="document"><div class="modal-content"><form action="'+formUrl+'" method="post" enctype="multipart/form-data"><input type="hidden" name="'+csrfName+'" value="'+csrfHash+'"/><input type="hidden" value="'+carName+'" name="car_name"/><input type="hidden" value="'+category_id+'" name="car_category_id"/><div class="modal-header"><h3 class="modal-title">Update Car</h3></div><div class="modal-body"><div class="row"><div class="col-12"><div class="form-group"><label>Car Name</label><input type="text" name="car_new_name" class="form-control form-control-sm" placeholder="Enter car name." value="'+carName+'"></div><div class="form-group"><label class="label">Car Category</label><select name="new_car_category_id" class="form-control form-control-sm"><option value="">Select Category</option>';
+            
+            if(res.success) {
+              let categories = res.data.categories;
+              categories.forEach(element => {
+                if(element.id == category_id) {
+                  modal += '<option value="'+element.id+'" selected>'+element.category+'</option>';
+                } else {
+                  modal += '<option value="'+element.id+'">'+element.category+'</option>';
+                }
+              });
+            }
+            modal += '</select></div><div class="form-gorup"><label class="label">Update Image</label><input type="file" id="imageUpload" class="form-control form-control-sm" name="car_image" accept=".png, .jpg, .jpeg" onchange="previewCarFile()" /></div><div class="w-100" style="max-height: 200px;"><img id="carImagePreview" class="img-fluid" style="height: 100px;" src="https://www.loginradius.com/wp-content/plugins/all-in-one-seo-pack/images/default-user-image.png"></div></div></div><span class="text-danger" id="error-cate"></span></div><div class="modal-footer"><button class="btn btn-sm btn-primary" type="submit" onclick="saveCategory()"><i class="fa fa-plus"></i> Save Category</button></div></form></div></div>';
+            $('#overlay').hide();
+            $('#show-car-details').html(modal).modal('show');
+          }
+        });
+      }
+
+      function openEditCategoryModal(id, category) {
+        let modal = '<div class="modal-dialog" role="document"><div class="modal-content"><div class="modal-header"><h3 class="modal-title">Update Category</h3></div><div class="modal-body"><div class="row"><input type="hidden" name="cate_id" value="'+id+'"/><div class="col-12"><div class="form-group"><label>Category Name</label><input type="text" name="category_name" class="form-control form-control-sm" placeholder="Enter category name." value="'+category+'"></div></div></div><span class="text-danger" id="error-cate"></span></div><div class="modal-footer"><button class="btn btn-sm btn-primary" type="button" onclick="saveCategory('+id+')"><i class="fa fa-plus"></i> Save Category</button></div></div></div>'; 
+        $('#show-category-add-modal').html(modal).modal('show');
+       
+      }
+      $('table[id="car-category-table"]').DataTable();
+
+      function removeCategory(id) {
+        if(confirm('Do you want to remove this category?')) {
+          window.location.replace('<?php echo base_url();?>admin/cars/categories/delete/'+id);
+        }
+      }
+
+      function removeCar(id) {
+        if(confirm('Do you want to remove this car?')) {
+          window.location.replace('<?php echo base_url();?>admin/cars/delete/'+id);
+        }
+      }
   <?php endif; ?>
 </script>
 </body>
